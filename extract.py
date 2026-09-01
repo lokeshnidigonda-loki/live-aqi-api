@@ -3,10 +3,13 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 from datetime import datetime, timezone
 
-# 1. Your specific credentials are already here
-API_KEY = "838e7857a0fa8cef9afdb64b5dc47ec5"
-DB_URL = "postgresql://neondb_owner:npg_U9PTdwk7XGLm@ep-raspy-smoke-a51wnara-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+import os
 
+API_KEY = os.environ.get("OWM_API_KEY")
+DB_URL = os.environ.get("DATABASE_URL")
+
+if not API_KEY or not DB_URL:
+    raise ValueError("Missing required environment variables.")
 # 2. Target Cities with Latitude and Longitude
 CITIES = {
     "Hyderabad": {"lat": 17.3850, "lon": 78.4867},

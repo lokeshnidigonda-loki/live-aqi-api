@@ -24,4 +24,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Extraction Script
+        env:
+          OWM_API_KEY: ${{ secrets.OWM_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python extract.py

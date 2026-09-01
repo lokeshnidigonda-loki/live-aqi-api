@@ -6,7 +6,13 @@ app = FastAPI(
     description="Real-time and historical Air Quality Index (AQI) data pipeline."
 )
 
-DB_URL = "postgresql://neondb_owner:npg_U9PTdwk7XGLm@ep-raspy-smoke-a51wnara-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+import os
+
+DB_URL = os.environ.get("DATABASE_URL")
+
+if not DB_URL:
+    raise ValueError("DATABASE_URL environment variable is missing.")
+
 engine = create_engine(DB_URL)
 
 @app.get("/")
