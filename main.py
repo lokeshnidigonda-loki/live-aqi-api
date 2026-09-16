@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException
 from sqlalchemy import create_engine, text
 
@@ -5,8 +6,6 @@ app = FastAPI(
     title="Live Urban Environment API",
     description="Real-time and historical Air Quality Index (AQI) data pipeline."
 )
-
-import os
 
 DB_URL = os.environ.get("DATABASE_URL")
 
@@ -25,6 +24,29 @@ def get_latest_aqi():
         SELECT DISTINCT ON (city) city, aqi, pm2_5, pm10, recorded_at 
         FROM aqi_readings 
         ORDER BY city, recorded_at DESC;
+    """)
+    
+    with engine.connect() as conn:
+        result = conn.execute(query)
+        data = [
+            {
+                "city": row[0], 
+                "aqi": row[1], 
+                "pm2_5": row[2], 
+                "pm10": row[3], 
+                "recorded_at": row[4].isoformat() if row[4] else None
+            } 
+            for row in result
+        ]
+        
+    return {"count": len(data), "data": data}
+
+@app.get("/api/v1/aqi/all")
+def get_all_aqi():
+    query = text("""
+        SELECT city, aqi, pm2_5, pm10, recorded_at 
+        FROM aqi_readings 
+        ORDER BY recorded_at DESC;
     """)
     
     with engine.connect() as conn:
